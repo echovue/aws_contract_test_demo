@@ -16,6 +16,10 @@ dependencies {
     compile 'com.sun.jersey:jersey-servlet:1.13'
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.14' //we want gradle 2.10 to run this project
+}
+
 task jettyDaemon() {
     onlyIf {
         'localhost'.equalsIgnoreCase(System.getProperty('integration.server', 'localhost'))
