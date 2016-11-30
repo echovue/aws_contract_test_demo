@@ -16,6 +16,25 @@ sourceSets {
     }
 }
 
+task cloneDynamoDbLocal << {
+    Grgit.clone(dir: file('support/dynamoDbLocal'),
+            uri: 'https://github.com/echovue/aws_contract_test_demo.git')
+}
+
+task startDynamoDbLocal(type: SpawnProcessTask, dependsOn: [assemble]) {
+    command "java -Djava.library.path=support/dynamoDBLocal -jar support/dynamoDBLocal/DynamoDBLocal.jar -sharedDb"
+    ready 'Initializing DynamoDB Local'
+    pidLockFileName '.dynamodb.pid.lock'
+}
+
+task stopDynamoDbLocal(type: KillProcessTask) {
+    pidLockFileName '.dynamodb.pid.lock'
+}
+
+task cleanDynamoDbLocalDir(type: Delete) {
+    delete "support/dynamoDBLocal"
+}
+
 task contractTest(dependsOn: 'jettyDaemon', type: Test, description: 'Runs integration tests') {
 /*    testClassesDir = sourceSets.integration.output.classesDir
     classPath = sourceSets.integration.runtimeClasspath*/
@@ -23,8 +42,61 @@ task contractTest(dependsOn: 'jettyDaemon', type: Test, description: 'Runs integ
     finalizedBy jettyStop
 }
 
-task cloneDynamoDbLocal << {
-    Grgit.clone(dir: file('support/dynamoDbLocal'),
-            uri: 'https://github.com/echovue/aws_contract_test_demo.git')
+task contract(type: Test) {
+    doFirst {
+/*        System.setProperty('http.proxyHost', '')
+        System.setProperty('http.proxyPort', '')
+        System.setProperty('https.proxyHost', '')
+        System.setProperty('https.proxyPort', '')
+        System.setProperty('aws.accessKeyId', '1234')
+        System.setProperty('aws.secretKey', '1234')
+        jettyRun.contextPath = '/'*/
+        jettyRun.httpPort = 16010
+        jettyRun.stopPort = 16011
+        jettyRun.stopKey = rootProject.name
+        jettyRun.daemon = true
+        jettyRun.execute()
+    }
+
+    testClassesDir = sourceSets.integration.output.classesDir
+    classpath = sourceSets.integration.runtimeClasspath
+
+    useJUnit {
+        includeCategories 'com.echovue.integration.ContractTest'
+    }
+
+    description = "Run the contract tests in src/integration/java"
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events "failed"
+        exceptionFormat "short"
+
+        // set options for log level DEBUG
+        debug {
+            events "started", "skipped", "failed"
+            exceptionFormat "full"
+        }
+
+        // remove standard output/error logging from --info builds
+        // by assigning only 'failed' and 'skipped' events
+        info.events = ["failed", "skipped"]
+    }
+
+    reports.html.destination = "$buildDir/reports/contractTest"
+
+    // contract test should run after build
+    check.dependsOn -= contract
+
+    outputs.upToDateWhen { false }
 }
 
+task contractTestCleanUp << {
+    jettyStop.stopPort = 16011
+    jettyStop.stopKey = rootProject.name
+    jettyStop.execute()
+    stopDynamoDbLocal.execute()
+//    stopElasticMq.execute()
+}
+
+contract.finalizedBy(contractTestCleanUp)
