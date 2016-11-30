@@ -65,8 +65,8 @@ task contract(type: Test) {
         jettyRun.execute()
     }
 
-    testClassesDir = sourceSets.integration.output.classesDir
-    classpath = sourceSets.integration.runtimeClasspath
+    testClassesDir = sourceSets.contractTest.output.classesDir
+    classpath = sourceSets.contractTest.runtimeClasspath
 
     useJUnit {
         includeCategories 'com.echovue.integration.ContractTest'
