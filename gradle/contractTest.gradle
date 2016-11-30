@@ -103,6 +103,7 @@ task contractTestCleanUp << {
     jettyStop.stopKey = rootProject.name
     jettyStop.execute()
     stopDynamoDbLocal.execute()
+    cleanDynamoDbLocalDir.execute()
 //    stopElasticMq.execute()
 }
 
