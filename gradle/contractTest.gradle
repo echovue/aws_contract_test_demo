@@ -24,6 +24,7 @@ sourceSets {
 }
 
 task cloneDynamoDbLocal << {
+    cleanDynamoDbLocalDir.execute()
     Grgit.clone(dir: file('support/dynamoDbLocal'),
             uri: 'https://github.com/echovue/DynamoDbLocal.git')
 }
@@ -103,7 +104,6 @@ task contractTestCleanUp << {
     jettyStop.stopKey = rootProject.name
     jettyStop.execute()
     stopDynamoDbLocal.execute()
-    cleanDynamoDbLocalDir.execute()
 //    stopElasticMq.execute()
 }
 
