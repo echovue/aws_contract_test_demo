@@ -1,5 +1,6 @@
 import org.ajoberstar.grgit.Grgit
 import com.wiredforcode.gradle.spawn.SpawnProcessTask
+import com.wiredforcode.gradle.spawn.KillProcessTask
 
 buildscript {
     repositories {
