@@ -11,7 +11,7 @@ buildscript {
 
     dependencies {
         classpath 'org.ajoberstar:grgit:1.7.0'
-        classpath 'com.wiredforcode:gradle-spawn-plugin:0.8.2'
+        classpath 'gradle.plugin.com.wiredforcode:gradle-spawn-plugin:0.8.2'
     }
 }
 
