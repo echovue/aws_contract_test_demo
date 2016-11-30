@@ -25,7 +25,7 @@ sourceSets {
 
 task cloneDynamoDbLocal << {
     Grgit.clone(dir: file('support/dynamoDbLocal'),
-            uri: 'https://github.com/echovue/aws_contract_test_demo.git')
+            uri: 'https://github.com/echovue/DynamoDbLocal.git')
 }
 
 task startDynamoDbLocal(type: SpawnProcessTask, dependsOn: [assemble]) {
